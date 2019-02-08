@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "nuklear_xlib_gl2.h": "c",
+        "nuklear.h": "c",
+        "glxext.h": "c",
+        "glx.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "intel_undervolt.h": "c"
+    }
+}

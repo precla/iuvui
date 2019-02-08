@@ -1,0 +1,56 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-f", "${fileDirname}/*.o", "${fileDirname}/bin/iuvui"
+            ]
+        },
+        {
+            "label": "compile",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-c", "-Wall", "-Wextra", "-pedantic", "-g",
+                "${fileDirname}/main.c", "${fileDirname}/intel_undervolt.c"
+            ],
+            "dependsOn": [
+                "clean"
+            ]
+        },
+        {
+            "label": "move",
+            "type": "shell",
+            "command": "mv",
+            "args": [
+                "${workspaceFolder}/main.o", "${workspaceFolder}/intel_undervolt.o",
+                "${fileDirname}/bin/"
+            ],
+            "dependsOn": [
+                "compile"
+            ]
+        },
+        {
+            "label": "link",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-g", "-o", "${fileDirname}/bin/iuvui",
+                "${fileDirname}/bin/main.o", "${fileDirname}/bin/intel_undervolt.o",
+                "-lX11", "-lm", "-lGL", "-lGLU"
+            ],
+            "dependsOn": [
+                "move"
+            ]
+        },
+        {
+            "label": "debug",
+            "dependsOn": [
+                "link"
+            ]
+        }
+    ]
+}
