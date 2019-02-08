@@ -14,6 +14,7 @@
 #include <math.h>
 #include <time.h>
 #include <limits.h>
+#include <unistd.h>
 
 #include <GL/glx.h>
 #include <GL/glxext.h>
@@ -100,15 +101,6 @@ int main(void) {
         static char guiLog[GUILOGSIZE];
         int currentValues[COUNTELEMENTS] = {0};
         int newValues[COUNTELEMENTS] = {0};
-        FILE *iuv;
-
-        /* check if intel-undervolt is available */
-        iuv = popen("intel-undervolt", "r");
-        if (iuv == NULL){
-                die("intel-undervolt is not available.\nEither not installed or missing in path.");
-                goto cleanup;
-        }
-        pclose(iuv);
 
         memset(&win, 0, sizeof(win));
         win.dpy = XOpenDisplay(NULL);
@@ -233,8 +225,20 @@ int main(void) {
 
         bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
 
+        /* check if user is root or has root access */
+        if (geteuid() != 0){
+                fprintf(stdout, "%s", "\nplease run as root\n");
+                goto cleanup;
+        }
+
+        /* check if intel-undervolt is available and accessible */
+        if (access("/bin/intel-undervolt", X_OK) < 0){
+                fprintf(stdout, "%s", "\nerror accessing intel-undervolt. Does it exist in /bin/ ?\n");
+                goto cleanup;
+        }
+
         if (readVal(currentValues)){
-                strncpy(guiLog, "ERROR reading values from /etc/intel-undervold.conf", GUILOGSIZE);
+                strncpy(guiLog, "ERROR reading values from /etc/intel-undervolt.conf", GUILOGSIZE);
         }
 
         newValues[CPUOFFSET]            = currentValues[CPUOFFSET];
