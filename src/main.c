@@ -23,6 +23,7 @@
 #define GUILOGSIZE      256
 #define ROWHEIGHT       25
 #define ROWWIDTH        110
+#define MVLABEL         15
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -36,8 +37,8 @@
 #include "nuklear.h"
 #include "nuklear_xlib_gl2.h"
 
-#define WINDOW_WIDTH 520
-#define WINDOW_HEIGHT 370
+#define WINDOW_WIDTH 510
+#define WINDOW_HEIGHT 350
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
@@ -266,67 +267,77 @@ int main(void) {
                         static char analogvstr[MAXDIGIT];
                         static char dintervalstr[10];
 
-                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 4);
                         {
                                 nk_layout_row_push(ctx, ROWWIDTH);
-                                nk_label(ctx, "CPU mV:", NK_TEXT_LEFT);
+                                nk_label(ctx, "CPU:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[CPUOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
                                 snprintf(cpuvstr, MAXDIGIT, "%d", newValues[CPUOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, cpuvstr, NK_TEXT_RIGHT);
+                                nk_layout_row_push(ctx, MVLABEL);
+                                nk_label(ctx, "mV", NK_TEXT_RIGHT);
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 4);
                         {
                                 nk_layout_row_push(ctx, ROWWIDTH);
-                                nk_label(ctx, "GPU mV:", NK_TEXT_LEFT);
+                                nk_label(ctx, "GPU:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[GPUOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
                                 snprintf(gpuvstr, MAXDIGIT, "%d", newValues[GPUOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, gpuvstr, NK_TEXT_RIGHT);
+                                nk_layout_row_push(ctx, MVLABEL);
+                                nk_label(ctx, "mV", NK_TEXT_RIGHT);
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 4);
                         {
                                 nk_layout_row_push(ctx, ROWWIDTH);
-                                nk_label(ctx, "CPU Cache mV:", NK_TEXT_LEFT);
+                                nk_label(ctx, "CPU Cache:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[CPUCACHEOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
                                 snprintf(cachevstr, MAXDIGIT, "%d", newValues[CPUCACHEOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, cachevstr, NK_TEXT_RIGHT);
+                                nk_layout_row_push(ctx, MVLABEL);
+                                nk_label(ctx, "mV", NK_TEXT_RIGHT);
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 4);
                         {
                                 nk_layout_row_push(ctx, ROWWIDTH);
-                                nk_label(ctx, "System Agent mV:", NK_TEXT_LEFT);
+                                nk_label(ctx, "System Agent:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[SYSAOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
                                 snprintf(sysagvstr, MAXDIGIT, "%d", newValues[SYSAOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, sysagvstr, NK_TEXT_RIGHT);
+                                nk_layout_row_push(ctx, MVLABEL);
+                                nk_label(ctx, "mV", NK_TEXT_RIGHT);
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 4);
                         {
                                 nk_layout_row_push(ctx, ROWWIDTH);
-                                nk_label(ctx, "Analog IO mV:", NK_TEXT_LEFT);
+                                nk_label(ctx, "Analog IO:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[ANALOGIOOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
                                 snprintf(analogvstr, MAXDIGIT, "%d", newValues[ANALOGIOOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, analogvstr, NK_TEXT_RIGHT);
+                                nk_layout_row_push(ctx, MVLABEL);
+                                nk_label(ctx, "mV", NK_TEXT_RIGHT);
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 4);
                         {
                                 nk_layout_row_push(ctx, ROWWIDTH);
                                 nk_label(ctx, "Daemon Interval:", NK_TEXT_LEFT);
@@ -335,6 +346,8 @@ int main(void) {
                                 snprintf(dintervalstr, 10, "%d", newValues[DAEMONINTERVAL]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, dintervalstr, NK_TEXT_RIGHT);
+                                nk_layout_row_push(ctx, MVLABEL);
+                                nk_label(ctx, "ms", NK_TEXT_RIGHT);
                         }
                         nk_layout_row_end(ctx);
 
@@ -379,7 +392,7 @@ int main(void) {
 
                         nk_layout_row_dynamic(ctx, ROWHEIGHT, 1);
                         nk_label(ctx, "Output log:", NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, ROWHEIGHT*2, 1);
+                        nk_layout_row_dynamic(ctx, ROWHEIGHT, 1);
                         nk_label(ctx, guiLog, NK_TEXT_LEFT);
                 }
                 nk_end(ctx);
