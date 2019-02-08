@@ -1,6 +1,6 @@
-#iuvui - intel-undervolt user interface
+# iuvui - intel-undervolt user interface
 
-##!WIP!
+## !WIP!
 
 GUI for [intel-undervolt](https://github.com/kitsunyan/intel-undervolt)
 
