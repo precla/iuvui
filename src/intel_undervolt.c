@@ -37,6 +37,10 @@ int setValIntoConfFile(int offset, short option){
                         strncat(newConf, "undervolt 4 'Analog I/O' ", 26);
                         intToString(offset, tmp, newConf);
                         break;
+                case DAEMONINTERVAL:
+                        strncat(newConf, "interval ", 10);
+                        intToString(offset, tmp, newConf);
+                        break;
                 default:
                         return 1;
         }
@@ -56,6 +60,8 @@ int setValIntoConfFile(int offset, short option){
                 } else if (option == SYSAOFFSET && strstr(currConf, "undervolt 3 \'System Agent")) {
                         break;
                 } else if (option == ANALOGIOOFFSET && strstr(currConf, "undervolt 4 \'Analog I/O")) {
+                        break;
+                } else if (option == DAEMONINTERVAL && strstr(currConf, "interval")) {
                         break;
                 }
         }
@@ -91,15 +97,17 @@ int readVal(int *currVal){
                 if (strchr(readCfg, '#')){
                         continue;
                 } else if (strstr(readCfg, "undervolt 0 \'CPU\'")) {
-                        currVal[CPUOFFSET] = strtof(strrchr(readCfg, ' ')+1, NULL);
+                        currVal[CPUOFFSET] = (int)strtof(strrchr(readCfg, ' ')+1, NULL);
                 } else if (strstr(readCfg, "undervolt 1 \'GPU\'")) {
-                        currVal[GPUOFFSET] = strtof(strrchr(readCfg, ' ')+1, NULL);
+                        currVal[GPUOFFSET] = (int)strtof(strrchr(readCfg, ' ')+1, NULL);
                 } else if (strstr(readCfg, "undervolt 2 \'CPU Cache\' ")) {
-                        currVal[CPUCACHEOFFSET] = strtof(strrchr(readCfg, ' ')+1, NULL);
+                        currVal[CPUCACHEOFFSET] = (int)strtof(strrchr(readCfg, ' ')+1, NULL);
                 } else if (strstr(readCfg, "undervolt 3 \'System Agent\'")) {
-                        currVal[SYSAOFFSET] = strtof(strrchr(readCfg, ' ')+1, NULL);
+                        currVal[SYSAOFFSET] = (int)strtof(strrchr(readCfg, ' ')+1, NULL);
                 } else if (strstr(readCfg, "undervolt 4 \'Analog I/O\'")) {
-                        currVal[ANALOGIOOFFSET] = strtof(strrchr(readCfg, ' ')+1, NULL);
+                        currVal[ANALOGIOOFFSET] = (int)strtof(strrchr(readCfg, ' ')+1, NULL);
+                } else if (strstr(readCfg, "interval")) {
+                        currVal[DAEMONINTERVAL] = (int)strtof(strrchr(readCfg, ' ')+1, NULL);
                 }
         }
 
@@ -144,6 +152,12 @@ short applyValues(int *newValues, int *currentValues){
                 count++;
                 currentValues[ANALOGIOOFFSET] = newValues[ANALOGIOOFFSET];
         }
+        if (newValues[DAEMONINTERVAL] != currentValues[DAEMONINTERVAL]){
+                if(setValIntoConfFile(newValues[DAEMONINTERVAL], DAEMONINTERVAL))
+                        return -1;
+                count++;
+                currentValues[DAEMONINTERVAL] = newValues[DAEMONINTERVAL];
+        }
 
         /* write to file and apply settings */
         if((fproc = popen("intel-undervolt apply", "r")) == NULL){
@@ -175,8 +189,7 @@ int tempOffsetAlt(int temp){
 }
 
 int daemonUpdateInterval(unsigned int time){
-        /* TODO */
-        return 0;
+        return setValIntoConfFile(time, DAEMONINTERVAL);
 }
 
 int uvResetAll(){

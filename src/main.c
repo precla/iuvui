@@ -95,14 +95,9 @@ int main(void) {
 
         /* variables for intel-undervolt */
         static char guiLog[GUILOGSIZE];
-        int currentValues[5] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f};;
+        int currentValues[COUNTELEMENTS] = {0};
+        int newValues[COUNTELEMENTS] = {0};
         FILE *iuv;
-
-        static int cpuv;
-        static int gpuv;
-        static int cachev;
-        static int sysagv;
-        static int analogv;
 
         /* check if intel-undervolt is available */
         iuv = popen("intel-undervolt", "r");
@@ -239,11 +234,12 @@ int main(void) {
                 strncpy(guiLog, "ERROR reading values from /etc/intel-undervold.conf", GUILOGSIZE);
         }
 
-        cpuv = currentValues[CPUOFFSET];
-        gpuv = currentValues[GPUOFFSET];
-        cachev = currentValues[CPUCACHEOFFSET];
-        sysagv = currentValues[SYSAOFFSET];
-        analogv = currentValues[ANALOGIOOFFSET];
+        newValues[CPUOFFSET]            = currentValues[CPUOFFSET];
+        newValues[GPUOFFSET]            = currentValues[GPUOFFSET];
+        newValues[CPUCACHEOFFSET]       = currentValues[CPUCACHEOFFSET];
+        newValues[SYSAOFFSET]           = currentValues[SYSAOFFSET];
+        newValues[ANALOGIOOFFSET]       = currentValues[ANALOGIOOFFSET];
+        newValues[DAEMONINTERVAL]       = currentValues[DAEMONINTERVAL];
 
         while (running) {
                 /* Input */
@@ -259,7 +255,6 @@ int main(void) {
 
                 /* GUI */
                 if (nk_begin(ctx, "maingui", nk_rect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT), NK_WINDOW_BORDER)) {
-                        static int newValues[5];
                         static int retVal = 0;
 
                         static char cpuvstr[MAXDIGIT];
@@ -267,14 +262,15 @@ int main(void) {
                         static char cachevstr[MAXDIGIT];
                         static char sysagvstr[MAXDIGIT];
                         static char analogvstr[MAXDIGIT];
+                        static char dintervalstr[10];
 
                         nk_layout_row_begin(ctx, NK_STATIC, 25, 3);
                         {
                                 nk_layout_row_push(ctx, 80);
                                 nk_label(ctx, "CPU mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
-                                nk_slider_int(ctx, MINVOLTAGEOFF, &cpuv, MAXVOLTAGEOFF, VOLTAGESTEP);
-                                snprintf(cpuvstr, MAXDIGIT, "%d", cpuv);
+                                nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[CPUOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
+                                snprintf(cpuvstr, MAXDIGIT, "%d", newValues[CPUOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, cpuvstr, NK_TEXT_RIGHT);
                         }
@@ -285,8 +281,8 @@ int main(void) {
                                 nk_layout_row_push(ctx, 80);
                                 nk_label(ctx, "GPU mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
-                                nk_slider_int(ctx, MINVOLTAGEOFF, &gpuv, MAXVOLTAGEOFF, VOLTAGESTEP);
-                                snprintf(gpuvstr, MAXDIGIT, "%d", gpuv);
+                                nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[GPUOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
+                                snprintf(gpuvstr, MAXDIGIT, "%d", newValues[GPUOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, gpuvstr, NK_TEXT_RIGHT);
                         }
@@ -297,8 +293,8 @@ int main(void) {
                                 nk_layout_row_push(ctx, 80);
                                 nk_label(ctx, "CPU Cache mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
-                                nk_slider_int(ctx, MINVOLTAGEOFF, &cachev, MAXVOLTAGEOFF, VOLTAGESTEP);
-                                snprintf(cachevstr, MAXDIGIT, "%d", cachev);
+                                nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[CPUCACHEOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
+                                snprintf(cachevstr, MAXDIGIT, "%d", newValues[CPUCACHEOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, cachevstr, NK_TEXT_RIGHT);
                         }
@@ -309,8 +305,8 @@ int main(void) {
                                 nk_layout_row_push(ctx, 80);
                                 nk_label(ctx, "System Agent mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
-                                nk_slider_int(ctx, MINVOLTAGEOFF, &sysagv, MAXVOLTAGEOFF, VOLTAGESTEP);
-                                snprintf(sysagvstr, MAXDIGIT, "%d", sysagv);
+                                nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[SYSAOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
+                                snprintf(sysagvstr, MAXDIGIT, "%d", newValues[SYSAOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, sysagvstr, NK_TEXT_RIGHT);
                         }
@@ -321,10 +317,22 @@ int main(void) {
                                 nk_layout_row_push(ctx, 80);
                                 nk_label(ctx, "Analog IO mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
-                                nk_slider_int(ctx, MINVOLTAGEOFF, &analogv, MAXVOLTAGEOFF, VOLTAGESTEP);
-                                snprintf(analogvstr, MAXDIGIT, "%d", analogv);
+                                nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[ANALOGIOOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
+                                snprintf(analogvstr, MAXDIGIT, "%d", newValues[ANALOGIOOFFSET]);
                                 nk_layout_row_push(ctx, 45);
                                 nk_label(ctx, analogvstr, NK_TEXT_RIGHT);
+                        }
+                        nk_layout_row_end(ctx);
+
+                        nk_layout_row_begin(ctx, NK_STATIC, 25, 3);
+                        {
+                                nk_layout_row_push(ctx, 90);
+                                nk_label(ctx, "Daemon Interval:", NK_TEXT_LEFT);
+                                nk_layout_row_push(ctx, 300);
+                                nk_slider_int(ctx, 1000, &newValues[DAEMONINTERVAL], 100000, 500);
+                                snprintf(dintervalstr, 10, "%d", newValues[DAEMONINTERVAL]);
+                                nk_layout_row_push(ctx, 45);
+                                nk_label(ctx, dintervalstr, NK_TEXT_RIGHT);
                         }
                         nk_layout_row_end(ctx);
 
@@ -334,11 +342,12 @@ int main(void) {
                                 if(readVal(currentValues)){
                                         strncpy(guiLog, "ERROR reading values from /etc/intel-undervolt.conf", GUILOGSIZE);
                                 } else {
-                                        cpuv = currentValues[CPUOFFSET];
-                                        gpuv = currentValues[GPUOFFSET];
-                                        cachev = currentValues[CPUCACHEOFFSET];
-                                        sysagv = currentValues[SYSAOFFSET];
-                                        analogv = currentValues[ANALOGIOOFFSET];
+                                        newValues[CPUOFFSET]            = currentValues[CPUOFFSET];
+                                        newValues[GPUOFFSET]            = currentValues[GPUOFFSET];
+                                        newValues[CPUCACHEOFFSET]       = currentValues[CPUCACHEOFFSET];
+                                        newValues[SYSAOFFSET]           = currentValues[SYSAOFFSET];
+                                        newValues[ANALOGIOOFFSET]       = currentValues[ANALOGIOOFFSET];
+                                        newValues[DAEMONINTERVAL]       = currentValues[DAEMONINTERVAL];
                                         strncpy(guiLog, "Values read from /etc/intel-undervolt.conf", GUILOGSIZE);
                                 }
                         }
@@ -347,20 +356,15 @@ int main(void) {
                                         strncpy(guiLog, "ERROR resetting values!", GUILOGSIZE);
                                 } else {
                                         strncpy(guiLog, "All values have been reset to zero.", GUILOGSIZE);
-                                        currentValues[CPUOFFSET] = cpuv = 0;
-                                        currentValues[GPUOFFSET] = gpuv = 0;
-                                        currentValues[CPUCACHEOFFSET] = cachev = 0;
-                                        currentValues[SYSAOFFSET] = sysagv = 0;
-                                        currentValues[ANALOGIOOFFSET] = analogv = 0;
+                                        currentValues[CPUOFFSET]        = newValues[CPUOFFSET] = 0;
+                                        currentValues[GPUOFFSET]        = newValues[GPUOFFSET] = 0;
+                                        currentValues[CPUCACHEOFFSET]   = newValues[CPUCACHEOFFSET] = 0;
+                                        currentValues[SYSAOFFSET]       = newValues[SYSAOFFSET] = 0;
+                                        currentValues[ANALOGIOOFFSET]   = newValues[ANALOGIOOFFSET] = 0;
+                                        currentValues[DAEMONINTERVAL]   = newValues[DAEMONINTERVAL] = 0;
                                 }
                         }
                         if (nk_button_label(ctx, "Apply")){
-                                newValues[CPUOFFSET]            = cpuv;
-                                newValues[GPUOFFSET]            = gpuv;
-                                newValues[CPUCACHEOFFSET]       = cachev;
-                                newValues[SYSAOFFSET]           = sysagv;
-                                newValues[ANALOGIOOFFSET]       = analogv;
-
                                 retVal = applyValues(newValues, currentValues);
                                 if (retVal == 0){
                                         strncpy(guiLog, "Values are same as in config. Nothing changed.", GUILOGSIZE);

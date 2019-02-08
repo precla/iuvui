@@ -3,16 +3,19 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#define CONFFILE        "/etc/intel-undervolt.conf"
-//#define CONFFILE        "./intel-undervolt.conf"
+#define CONFFILE        "./intel-undervolt.conf"
+
+/* count elements below */
+#define COUNTELEMENTS   6
 
 #define CPUOFFSET       0
 #define GPUOFFSET       1
 #define CPUCACHEOFFSET  2
 #define SYSAOFFSET      3
 #define ANALOGIOOFFSET  4
+#define DAEMONINTERVAL  5
 
-/* max nuber of digits */
+/* max number of digits */
 #define MAXDIGIT        6
 /* Length for undervolt option */
 #define UV_OPTION       64
@@ -27,7 +30,7 @@
 
 /*
  * Set the value into the config file /etc/intel-undervolt.conf
- * and apply it
+ * and apply it. Returns 0 on success
  */
 int setValIntoConfFile(int, short);
 
