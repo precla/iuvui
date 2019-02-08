@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#define CONFFILE        "./intel-undervolt.conf"
+#define CONFFILE        "/etc/intel-undervolt.conf"
 
 /* count elements below */
 #define COUNTELEMENTS   6

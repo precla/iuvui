@@ -21,6 +21,8 @@
 #include "intel_undervolt.h"
 
 #define GUILOGSIZE      256
+#define ROWHEIGHT       25
+#define ROWWIDTH        110
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -34,8 +36,8 @@
 #include "nuklear.h"
 #include "nuklear_xlib_gl2.h"
 
-#define WINDOW_WIDTH 480
-#define WINDOW_HEIGHT 400
+#define WINDOW_WIDTH 520
+#define WINDOW_HEIGHT 370
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
@@ -264,9 +266,9 @@ int main(void) {
                         static char analogvstr[MAXDIGIT];
                         static char dintervalstr[10];
 
-                        nk_layout_row_begin(ctx, NK_STATIC, 25, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
                         {
-                                nk_layout_row_push(ctx, 80);
+                                nk_layout_row_push(ctx, ROWWIDTH);
                                 nk_label(ctx, "CPU mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[CPUOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
@@ -276,9 +278,9 @@ int main(void) {
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, 25, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
                         {
-                                nk_layout_row_push(ctx, 80);
+                                nk_layout_row_push(ctx, ROWWIDTH);
                                 nk_label(ctx, "GPU mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[GPUOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
@@ -288,9 +290,9 @@ int main(void) {
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, 25, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
                         {
-                                nk_layout_row_push(ctx, 80);
+                                nk_layout_row_push(ctx, ROWWIDTH);
                                 nk_label(ctx, "CPU Cache mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[CPUCACHEOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
@@ -300,9 +302,9 @@ int main(void) {
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, 25, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
                         {
-                                nk_layout_row_push(ctx, 80);
+                                nk_layout_row_push(ctx, ROWWIDTH);
                                 nk_label(ctx, "System Agent mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[SYSAOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
@@ -312,9 +314,9 @@ int main(void) {
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, 25, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
                         {
-                                nk_layout_row_push(ctx, 80);
+                                nk_layout_row_push(ctx, ROWWIDTH);
                                 nk_label(ctx, "Analog IO mV:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, MINVOLTAGEOFF, &newValues[ANALOGIOOFFSET], MAXVOLTAGEOFF, VOLTAGESTEP);
@@ -324,9 +326,9 @@ int main(void) {
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_begin(ctx, NK_STATIC, 25, 3);
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
                         {
-                                nk_layout_row_push(ctx, 90);
+                                nk_layout_row_push(ctx, ROWWIDTH);
                                 nk_label(ctx, "Daemon Interval:", NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 300);
                                 nk_slider_int(ctx, 1000, &newValues[DAEMONINTERVAL], 100000, 500);
@@ -336,7 +338,7 @@ int main(void) {
                         }
                         nk_layout_row_end(ctx);
 
-                        nk_layout_row_static(ctx, 30, 95, 3);
+                        nk_layout_row_static(ctx, ROWHEIGHT, 95, 3);
                         if (nk_button_label(ctx, "Read values")){
                                 /* open /etc/intel-undervolt.conf and read values */
                                 if(readVal(currentValues)){
@@ -375,9 +377,9 @@ int main(void) {
                                 }
                         }
 
-                        nk_layout_row_dynamic(ctx, 20, 1);
+                        nk_layout_row_dynamic(ctx, ROWHEIGHT, 1);
                         nk_label(ctx, "Output log:", NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, 40, 1);
+                        nk_layout_row_dynamic(ctx, ROWHEIGHT*2, 1);
                         nk_label(ctx, guiLog, NK_TEXT_LEFT);
                 }
                 nk_end(ctx);
