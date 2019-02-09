@@ -90,6 +90,19 @@ has_extension (const char *string, const char *ext) {
 }
 
 int main(void) {
+
+        /* check if user is root or has root access */
+        if (geteuid() != 0){
+                fprintf(stdout, "%s", "\nplease run as root\nexiting...\n");
+                exit(1);
+        }
+
+        /* check if intel-undervolt is available and accessible */
+        if (access("/bin/intel-undervolt", X_OK) < 0){
+                fprintf(stdout, "%s", "\nerror accessing intel-undervolt. Does it exist in /bin/ ?\n");
+                exit(1);
+        }
+
         /* Platform */
         int running = 1;
         struct XWindow win;
@@ -224,18 +237,6 @@ int main(void) {
         /*nk_style_set_font(ctx, &droid->handle);*/}
 
         bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
-
-        /* check if user is root or has root access */
-        if (geteuid() != 0){
-                fprintf(stdout, "%s", "\nplease run as root\n");
-                goto cleanup;
-        }
-
-        /* check if intel-undervolt is available and accessible */
-        if (access("/bin/intel-undervolt", X_OK) < 0){
-                fprintf(stdout, "%s", "\nerror accessing intel-undervolt. Does it exist in /bin/ ?\n");
-                goto cleanup;
-        }
 
         if (readVal(currentValues)){
                 strncpy(guiLog, "ERROR reading values from /etc/intel-undervolt.conf", GUILOGSIZE);
