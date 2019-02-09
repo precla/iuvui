@@ -380,7 +380,7 @@ int main(void) {
                                         currentValues[CPUCACHEOFFSET]   = newValues[CPUCACHEOFFSET] = 0;
                                         currentValues[SYSAOFFSET]       = newValues[SYSAOFFSET] = 0;
                                         currentValues[ANALOGIOOFFSET]   = newValues[ANALOGIOOFFSET] = 0;
-                                        currentValues[DAEMONINTERVAL]   = newValues[DAEMONINTERVAL] = 0;
+                                        currentValues[DAEMONINTERVAL]   = newValues[DAEMONINTERVAL] = 5000;
                                 }
                         }
                         if (nk_button_label(ctx, "Apply")){
