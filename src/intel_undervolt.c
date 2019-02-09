@@ -5,7 +5,7 @@ int setValIntoConfFile(int offset, short option){
         char tmp[MAXLENSENTENCE];
         char currConf[MAXLENSENTENCE];
         char *fileSize;
-        struct stat *buf; 
+        struct stat buf; 
 
         fpos_t fpos;
 
@@ -18,32 +18,33 @@ int setValIntoConfFile(int offset, short option){
         switch (option)
         {
                 case CPUOFFSET:
-                        strncat(newConf, "undervolt 0 'CPU' ", 19);
+                        strncpy(newConf, "undervolt 0 'CPU' ", 19);
                         intToString(offset, tmp, newConf);
                         break;
                 case GPUOFFSET:
-                        strncat(newConf, "undervolt 1 'GPU' ", 19);
+                        strncpy(newConf, "undervolt 1 'GPU' ", 19);
                         intToString(offset, tmp, newConf);
                         break;
                 case CPUCACHEOFFSET:
-                        strncat(newConf, "undervolt 2 'CPU Cache' ", 25);
+                        strncpy(newConf, "undervolt 2 'CPU Cache' ", 25);
                         intToString(offset, tmp, newConf);
                         break;
                 case SYSAOFFSET:
-                        strncat(newConf, "undervolt 3 'System Agent' ", 28);
+                        strncpy(newConf, "undervolt 3 'System Agent' ", 28);
                         intToString(offset, tmp, newConf);
                         break;
                 case ANALOGIOOFFSET:
-                        strncat(newConf, "undervolt 4 'Analog I/O' ", 26);
+                        strncpy(newConf, "undervolt 4 'Analog I/O' ", 26);
                         intToString(offset, tmp, newConf);
                         break;
                 case DAEMONINTERVAL:
-                        strncat(newConf, "interval ", 10);
+                        strncpy(newConf, "interval ", 10);
                         intToString(offset, tmp, newConf);
                         break;
                 default:
                         return 1;
         }
+        strncat(newConf, "\n", 2);
 
         while (!feof(f)) {
                 fgetpos(f, &fpos);
@@ -65,12 +66,11 @@ int setValIntoConfFile(int offset, short option){
                         break;
                 }
         }
-        strncat(newConf, "\n", 2);
 
         /* get file size and allocate memory for it */
-        fstat(fileno(f), buf);
-        fileSize = (char *)calloc((size_t)buf->st_size, sizeof(char));
-        fread(fileSize, sizeof(char), (size_t)buf->st_size, f);
+        fstat(fileno(f), &buf);
+        fileSize = (char *)calloc((size_t)buf.st_size, sizeof(char));
+        fread(fileSize, sizeof(char), (size_t)buf.st_size, f);
 
         fsetpos(f, &fpos);
         fputs(newConf, f);
