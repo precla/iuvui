@@ -374,7 +374,7 @@ int main(void) {
                                 if (uvResetAll()){
                                         strncpy(guiLog, "ERROR resetting values!", GUILOGSIZE);
                                 } else {
-                                        strncpy(guiLog, "All values have been reset to zero.", GUILOGSIZE);
+                                        strncpy(guiLog, "All values have been reset to default.", GUILOGSIZE);
                                         currentValues[CPUOFFSET]        = newValues[CPUOFFSET] = 0;
                                         currentValues[GPUOFFSET]        = newValues[GPUOFFSET] = 0;
                                         currentValues[CPUCACHEOFFSET]   = newValues[CPUCACHEOFFSET] = 0;
