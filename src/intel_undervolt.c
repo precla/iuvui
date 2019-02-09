@@ -217,13 +217,21 @@ int uvResetAll(){
         FILE *f = fopen(CONFFILE, "w");
 
         if (!f) {
-                return 1;
+                return -1;
         }
         if (fprintf(f, "%s", resetValues) < 0) {
                 fclose(f);
-                return 1;
+                return -1;
         }
         fclose(f);
+
+        /* write to file and apply settings */
+        if((f = popen("intel-undervolt apply", "r")) == NULL){
+                return -1;
+        }
+
+        pclose(f);
+
         return 0;
 }
 
