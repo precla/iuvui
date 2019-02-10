@@ -9,8 +9,11 @@ GUI for [intel-undervolt](https://github.com/kitsunyan/intel-undervolt)
 - intel-undervolt
 - root
 
-## Thanks:
+## GUI based on:
 - [nuklear](https://github.com/vurtun/nuklear)
 
 ## Running:
 - make & run as root
+
+## TODO:
+- add histogram (or similar) for power consumption
