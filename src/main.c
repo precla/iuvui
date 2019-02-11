@@ -94,13 +94,13 @@ has_extension (const char *string, const char *ext) {
 int main(void) {
 
         /* check if user is root or has root access */
-        if (geteuid() != 0){
+        if (geteuid() != 0) {
                 fprintf(stdout, "%s", "\nplease run as root\nexiting...\n");
                 exit(1);
         }
 
         /* check if intel-undervolt is available and accessible */
-        if (access("/bin/intel-undervolt", X_OK) < 0){
+        if (access("/bin/intel-undervolt", X_OK) < 0) {
                 fprintf(stdout, "%s", "\nerror accessing intel-undervolt. Does it exist in /bin/ ?\n");
                 exit(1);
         }
@@ -241,7 +241,7 @@ int main(void) {
 
         bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
 
-        if (readVal(currentValues)){
+        if (readVal(currentValues)) {
                 strncpy(guiLog, "ERROR reading values from /etc/intel-undervolt.conf", GUILOGSIZE);
         }
 
@@ -253,7 +253,7 @@ int main(void) {
         newValues[DAEMONINTERVAL]       = currentValues[DAEMONINTERVAL];
         
         /* check if it's enabled on boot via systemd: */
-        if (systemdService(2) == 0){
+        if (systemdService(2) == 0) {
                 strncpy(onBoot, "YES", 4);
         } else {
                 strncpy(onBoot, "NO", 3);
@@ -369,9 +369,9 @@ int main(void) {
 
                         /* Read / Reset / Apply */
                         nk_layout_row_static(ctx, ROWHEIGHT, 95, 3);
-                        if (nk_button_label(ctx, "Read values")){
+                        if (nk_button_label(ctx, "Read values")) {
                                 /* open /etc/intel-undervolt.conf and read values */
-                                if(readVal(currentValues)){
+                                if(readVal(currentValues)) {
                                         strncpy(guiLog, "ERROR reading values from /etc/intel-undervolt.conf", GUILOGSIZE);
                                 } else {
                                         newValues[CPUOFFSET]            = currentValues[CPUOFFSET];
@@ -383,8 +383,8 @@ int main(void) {
                                         strncpy(guiLog, "Values read from /etc/intel-undervolt.conf", GUILOGSIZE);
                                 }
                         }
-                        if (nk_button_label(ctx, "Reset")){
-                                if (uvResetAll()){
+                        if (nk_button_label(ctx, "Reset")) {
+                                if (uvResetAll()) {
                                         strncpy(guiLog, "ERROR resetting values!", GUILOGSIZE);
                                 } else {
                                         strncpy(guiLog, "All values have been reset to default.", GUILOGSIZE);
@@ -396,11 +396,11 @@ int main(void) {
                                         currentValues[DAEMONINTERVAL]   = newValues[DAEMONINTERVAL] = 5000;
                                 }
                         }
-                        if (nk_button_label(ctx, "Apply")){
+                        if (nk_button_label(ctx, "Apply")) {
                                 retVal = applyValues(newValues, currentValues);
-                                if (retVal == 0){
+                                if (retVal == 0) {
                                         strncpy(guiLog, "Values are same as in config. Nothing changed.", GUILOGSIZE);
-                                } else if (retVal == -1){
+                                } else if (retVal == -1) {
                                         strncpy(guiLog, "Error while trying to apply values with 'intel-undervolt apply'.", GUILOGSIZE);
                                 } else {
                                         strncpy(guiLog, "New values set.", GUILOGSIZE);
@@ -415,16 +415,16 @@ int main(void) {
                                 nk_layout_row_push(ctx, 80);
                                 nk_label(ctx, onBoot, NK_TEXT_LEFT);
                                 nk_layout_row_push(ctx, 120);
-                                if (strcmp(onBoot, "YES") && nk_button_label(ctx, "Enable on boot")){
-                                        if (systemdService(1)){
+                                if (strcmp(onBoot, "YES") && nk_button_label(ctx, "Enable on boot")) {
+                                        if (systemdService(1)) {
                                                 strncpy(guiLog, "ERROR enabling intel-undervolt-loop.service!", GUILOGSIZE);
                                                 strncpy(onBoot, "???", 4);
                                         } else {
                                                 strncpy(guiLog, "intel-undervolt-loop.service successfully enabled.", GUILOGSIZE);
                                                 strncpy(onBoot, "YES", 4);
                                         }
-                                } else if (strcmp(onBoot, "NO") && nk_button_label(ctx, "Disable on boot")){
-                                        if (systemdService(0)){
+                                } else if (strcmp(onBoot, "NO") && nk_button_label(ctx, "Disable on boot")) {
+                                        if (systemdService(0)) {
                                                 strncpy(guiLog, "ERROR disabling intel-undervolt-loop.service!", GUILOGSIZE);
                                                 strncpy(onBoot, "???", 4);
                                         } else {

@@ -1,6 +1,6 @@
 #include "intel_undervolt.h"
 
-int setValIntoConfFile(int offset, short option){
+int setValIntoConfFile(int offset, short option) {
         char newConf[MAXLENSENTENCE];
         char tmp[MAXLENSENTENCE];
         char currConf[MAXLENSENTENCE];
@@ -50,7 +50,7 @@ int setValIntoConfFile(int offset, short option){
                 fgetpos(f, &fpos);
                 fgets(currConf, MAXLENSENTENCE, f);
 
-                if (strchr(currConf, '#') || strlen(currConf) < 8){
+                if (strchr(currConf, '#') || strlen(currConf) < 8) {
                         continue;
                 } else if (option == CPUOFFSET && strstr(currConf, "undervolt 0 \'CPU")) {
                         break;
@@ -83,7 +83,7 @@ int setValIntoConfFile(int offset, short option){
         return 0;
 }
 
-int readVal(int *currVal){
+int readVal(int *currVal) {
         char readCfg[MAXLENSENTENCE];
 
         FILE *f = fopen(CONFFILE, "r");
@@ -94,7 +94,7 @@ int readVal(int *currVal){
         while (!feof(f)) {
                 fgets(readCfg, 128, f);
 
-                if (strchr(readCfg, '#')){
+                if (strchr(readCfg, '#')) {
                         continue;
                 } else if (strstr(readCfg, "undervolt 0 \'CPU\'")) {
                         currVal[CPUOFFSET] = (int)strtof(strrchr(readCfg, ' ')+1, NULL);
@@ -114,7 +114,7 @@ int readVal(int *currVal){
         return 0;
 }
 
-short applyValues(int *newValues, int *currentValues){
+short applyValues(int *newValues, int *currentValues) {
         FILE *fproc;
         /* count how much values have changed
          * if zero, non has changed and nothing has been set
@@ -122,45 +122,45 @@ short applyValues(int *newValues, int *currentValues){
          */
         short count = 0;
 
-        if (newValues[CPUOFFSET] != currentValues[CPUOFFSET]){
-                if(setValIntoConfFile(newValues[CPUOFFSET], CPUOFFSET))
+        if (newValues[CPUOFFSET] != currentValues[CPUOFFSET]) {
+                if (setValIntoConfFile(newValues[CPUOFFSET], CPUOFFSET))
                         return -1;
                 count++;
                 currentValues[CPUOFFSET] = newValues[CPUOFFSET];
         }
-        if (newValues[GPUOFFSET] != currentValues[GPUOFFSET]){
-                if(setValIntoConfFile(newValues[GPUOFFSET], GPUOFFSET))
+        if (newValues[GPUOFFSET] != currentValues[GPUOFFSET]) {
+                if (setValIntoConfFile(newValues[GPUOFFSET], GPUOFFSET))
                         return -1;
                 count++;
                 currentValues[GPUOFFSET] = newValues[GPUOFFSET];
         }
-        if (newValues[CPUCACHEOFFSET] != currentValues[CPUCACHEOFFSET]){
-                if(setValIntoConfFile(newValues[CPUCACHEOFFSET], CPUCACHEOFFSET))
+        if (newValues[CPUCACHEOFFSET] != currentValues[CPUCACHEOFFSET]) {
+                if (setValIntoConfFile(newValues[CPUCACHEOFFSET], CPUCACHEOFFSET))
                         return -1;
                 count++;
                 currentValues[CPUCACHEOFFSET] = newValues[CPUCACHEOFFSET];
         }
-        if (newValues[SYSAOFFSET] != currentValues[SYSAOFFSET]){
-                if(setValIntoConfFile(newValues[SYSAOFFSET], SYSAOFFSET))
+        if (newValues[SYSAOFFSET] != currentValues[SYSAOFFSET]) {
+                if (setValIntoConfFile(newValues[SYSAOFFSET], SYSAOFFSET))
                         return -1;
                 count++;
                 currentValues[SYSAOFFSET] = newValues[SYSAOFFSET];
         }
-        if (newValues[ANALOGIOOFFSET] != currentValues[ANALOGIOOFFSET]){
-                if(setValIntoConfFile(newValues[ANALOGIOOFFSET], ANALOGIOOFFSET))
+        if (newValues[ANALOGIOOFFSET] != currentValues[ANALOGIOOFFSET]) {
+                if (setValIntoConfFile(newValues[ANALOGIOOFFSET], ANALOGIOOFFSET))
                         return -1;
                 count++;
                 currentValues[ANALOGIOOFFSET] = newValues[ANALOGIOOFFSET];
         }
-        if (newValues[DAEMONINTERVAL] != currentValues[DAEMONINTERVAL]){
-                if(setValIntoConfFile(newValues[DAEMONINTERVAL], DAEMONINTERVAL))
+        if (newValues[DAEMONINTERVAL] != currentValues[DAEMONINTERVAL]) {
+                if (setValIntoConfFile(newValues[DAEMONINTERVAL], DAEMONINTERVAL))
                         return -1;
                 count++;
                 currentValues[DAEMONINTERVAL] = newValues[DAEMONINTERVAL];
         }
 
         /* write to file and apply settings */
-        if((fproc = popen("intel-undervolt apply", "r")) == NULL){
+        if ((fproc = popen("intel-undervolt apply", "r")) == NULL) {
                 count = -1;
         }
 
@@ -168,56 +168,56 @@ short applyValues(int *newValues, int *currentValues){
         return count;
 }
 
-void measurePowerConsumption(){
+void measurePowerConsumption() {
         /* TODO */
         return;
 }
 
-int daemonMode(){
+int daemonMode() {
         /* TODO */
         return 0;
 }
 
-int powerLimitAlt(float shortPowerVal, float longPowerVal){
+int powerLimitAlt(float shortPowerVal, float longPowerVal) {
         /* TODO */
         return 0;
 }
 
-int tempOffsetAlt(int temp){
+int tempOffsetAlt(int temp) {
         /* TODO */
         return 0;
 }
 
-int daemonUpdateInterval(unsigned int time){
+int daemonUpdateInterval(unsigned int time) {
         return setValIntoConfFile(time, DAEMONINTERVAL);
 }
 
-int systemdService(int set){
+int systemdService(int set) {
         FILE *f;
         char tmpTxt[BUFFERSIZE];
 
-        if (set){
-                if ((f = popen("sudo systemctl enable intel-undervolt", "r")) == NULL){
+        if (set) {
+                if ((f = popen("sudo systemctl enable intel-undervolt", "r")) == NULL) {
                         return -1;
                 }
                 pclose(f);
-                if ((f = popen("sudo systemctl start intel-undervolt", "r")) == NULL){
+                if ((f = popen("sudo systemctl start intel-undervolt", "r")) == NULL) {
                         return -1;
                 }
-        } else if (set == 0){
-                if ((f = popen("sudo systemctl disable intel-undervolt", "r")) == NULL){
+        } else if (set == 0) {
+                if ((f = popen("sudo systemctl disable intel-undervolt", "r")) == NULL) {
                         return -1;
                 }
                 pclose(f);
-                if ((f = popen("sudo systemctl stop intel-undervolt", "r")) == NULL){
+                if ((f = popen("sudo systemctl stop intel-undervolt", "r")) == NULL) {
                         return -1;
                 }
         } else {
-                if ((f = popen("sudo systemctl status intel-undervolt", "r")) == NULL){
+                if ((f = popen("sudo systemctl status intel-undervolt", "r")) == NULL) {
                         return -1;
                 }
                 while (fgets(tmpTxt, BUFFERSIZE, f) != NULL) {
-                        if (strstr(tmpTxt, "intel-undervolt.service; enabled") != NULL){
+                        if (strstr(tmpTxt, "intel-undervolt.service; enabled") != NULL) {
                                 pclose(f);
                                 return 0;
                         }
@@ -225,14 +225,14 @@ int systemdService(int set){
         }
         pclose(f);
 
-        if ((f = popen("sudo systemctl status intel-undervolt", "r")) == NULL){
+        if ((f = popen("sudo systemctl status intel-undervolt", "r")) == NULL) {
                 return -1;
         }
         while (fgets(tmpTxt, BUFFERSIZE, f) != NULL) {
-                if (strstr(tmpTxt, "status=0/SUCCESS")){
+                if (strstr(tmpTxt, "status=0/SUCCESS")) {
                         pclose(f);
                         return 0;
-                } else if (strstr(tmpTxt, "intel-undervolt.service; disabled") != NULL){
+                } else if (strstr(tmpTxt, "intel-undervolt.service; disabled") != NULL) {
                         pclose(f);
                         return 0;
                 }
@@ -241,7 +241,7 @@ int systemdService(int set){
         return -1;
 }
 
-int uvResetAll(){
+int uvResetAll() {
         char *resetValues = "# CPU Undervolting\n"
                         "# Usage: undervolt ${index} ${display_name} ${undervolt_value}\n"
                         "# Example: undervolt 2 'CPU Cache' -25.84\n\n"
@@ -275,7 +275,7 @@ int uvResetAll(){
         fclose(f);
 
         /* write to file and apply settings */
-        if((f = popen("intel-undervolt apply", "r")) == NULL){
+        if((f = popen("intel-undervolt apply", "r")) == NULL) {
                 return -1;
         }
 
@@ -284,7 +284,7 @@ int uvResetAll(){
         return 0;
 }
 
-void intToString(int offset, char *tmp, char *dest){
+void intToString(int offset, char *tmp, char *dest) {
         snprintf(tmp, MAXDIGIT, "%d", offset);
         strncat(dest, tmp, UV_OPTION);
 }
