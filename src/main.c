@@ -21,6 +21,8 @@
 
 #include "intel_undervolt.h"
 
+#define IUVUIVERSION    "iuvui 0.1.0"
+
 #define GUILOGSIZE      256
 #define ROWHEIGHT       25
 #define ROWWIDTH        110
@@ -182,7 +184,7 @@ int main(void) {
                         win.vis->visual, CWBorderPixel|CWColormap|CWEventMask, &win.swa);
                 if (!win.win) die("[X11]: Failed to create window\n");
                 XFree(win.vis);
-                XStoreName(win.dpy, win.win, "iuvui");
+                XStoreName(win.dpy, win.win, IUVUIVERSION);
                 XMapWindow(win.dpy, win.win);
                 win.wm_delete_window = XInternAtom(win.dpy, "WM_DELETE_WINDOW", False);
                 XSetWMProtocols(win.dpy, win.win, &win.wm_delete_window, 1);
