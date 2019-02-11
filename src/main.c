@@ -111,6 +111,7 @@ int main(void) {
         struct nk_colorf bg;
 
         /* variables for intel-undervolt */
+        static char onBoot[MAXLENSENTENCE];
         static char guiLog[GUILOGSIZE];
         int currentValues[COUNTELEMENTS] = {0};
         int newValues[COUNTELEMENTS] = {0};
@@ -248,6 +249,13 @@ int main(void) {
         newValues[SYSAOFFSET]           = currentValues[SYSAOFFSET];
         newValues[ANALOGIOOFFSET]       = currentValues[ANALOGIOOFFSET];
         newValues[DAEMONINTERVAL]       = currentValues[DAEMONINTERVAL];
+        
+        /* check if it's enabled on boot via systemd: */
+        if (systemdService(2) == 0){
+                strncpy(onBoot, "YES", 4);
+        } else {
+                strncpy(onBoot, "NO", 3);
+        }
 
         while (running) {
                 /* Input */
@@ -272,6 +280,7 @@ int main(void) {
                         static char analogvstr[MAXDIGIT];
                         static char dintervalstr[10];
 
+                        /* Value sliders */
                         nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 4);
                         {
                                 nk_layout_row_push(ctx, ROWWIDTH);
@@ -356,6 +365,7 @@ int main(void) {
                         }
                         nk_layout_row_end(ctx);
 
+                        /* Read / Reset / Apply */
                         nk_layout_row_static(ctx, ROWHEIGHT, 95, 3);
                         if (nk_button_label(ctx, "Read values")){
                                 /* open /etc/intel-undervolt.conf and read values */
@@ -395,6 +405,35 @@ int main(void) {
                                 }
                         }
 
+                        /* Enable / disable on Boot */
+                        nk_layout_row_begin(ctx, NK_STATIC, ROWHEIGHT, 3);
+                        {
+                                nk_layout_row_push(ctx, ROWWIDTH);
+                                nk_label(ctx, "Enabled on Boot:", NK_TEXT_LEFT);
+                                nk_layout_row_push(ctx, 80);
+                                nk_label(ctx, onBoot, NK_TEXT_LEFT);
+                                nk_layout_row_push(ctx, 120);
+                                if (strcmp(onBoot, "YES") && nk_button_label(ctx, "Enable on boot")){
+                                        if (systemdService(1)){
+                                                strncpy(guiLog, "ERROR enabling intel-undervolt-loop.service!", GUILOGSIZE);
+                                                strncpy(onBoot, "???", 4);
+                                        } else {
+                                                strncpy(guiLog, "intel-undervolt-loop.service successfully enabled.", GUILOGSIZE);
+                                                strncpy(onBoot, "YES", 4);
+                                        }
+                                } else if (strcmp(onBoot, "NO") && nk_button_label(ctx, "Disable on boot")){
+                                        if (systemdService(0)){
+                                                strncpy(guiLog, "ERROR disabling intel-undervolt-loop.service!", GUILOGSIZE);
+                                                strncpy(onBoot, "???", 4);
+                                        } else {
+                                                strncpy(guiLog, "intel-undervolt-loop.service successfully disabled.", GUILOGSIZE);
+                                                strncpy(onBoot, "NO", 3);
+                                        }
+                                }
+                        }
+                        nk_layout_row_end(ctx);
+
+                        /* Output Log */
                         nk_layout_row_dynamic(ctx, ROWHEIGHT, 1);
                         nk_label(ctx, "Output log:", NK_TEXT_LEFT);
                         nk_layout_row_dynamic(ctx, ROWHEIGHT, 1);

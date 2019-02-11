@@ -192,6 +192,55 @@ int daemonUpdateInterval(unsigned int time){
         return setValIntoConfFile(time, DAEMONINTERVAL);
 }
 
+int systemdService(int set){
+        FILE *f;
+        char tmpTxt[BUFFERSIZE];
+
+        if (set){
+                if ((f = popen("sudo systemctl enable intel-undervolt", "r")) == NULL){
+                        return -1;
+                }
+                pclose(f);
+                if ((f = popen("sudo systemctl start intel-undervolt", "r")) == NULL){
+                        return -1;
+                }
+        } else if (set == 0){
+                if ((f = popen("sudo systemctl disable intel-undervolt", "r")) == NULL){
+                        return -1;
+                }
+                pclose(f);
+                if ((f = popen("sudo systemctl stop intel-undervolt", "r")) == NULL){
+                        return -1;
+                }
+        } else {
+                if ((f = popen("sudo systemctl status intel-undervolt", "r")) == NULL){
+                        return -1;
+                }
+                while (fgets(tmpTxt, BUFFERSIZE, f) != NULL) {
+                        if (strstr(tmpTxt, "intel-undervolt.service; enabled") != NULL){
+                                pclose(f);
+                                return 0;
+                        }
+                }
+        }
+        pclose(f);
+
+        if ((f = popen("sudo systemctl status intel-undervolt", "r")) == NULL){
+                return -1;
+        }
+        while (fgets(tmpTxt, BUFFERSIZE, f) != NULL) {
+                if (strstr(tmpTxt, "status=0/SUCCESS")){
+                        pclose(f);
+                        return 0;
+                } else if (strstr(tmpTxt, "intel-undervolt.service; disabled") != NULL){
+                        pclose(f);
+                        return 0;
+                }
+        }
+        pclose(f);
+        return -1;
+}
+
 int uvResetAll(){
         char *resetValues = "# CPU Undervolting\n"
                         "# Usage: undervolt ${index} ${display_name} ${undervolt_value}\n"

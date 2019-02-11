@@ -26,6 +26,8 @@
 #define MAXVOLTAGEOFF   100
 #define MINVOLTAGEOFF   -250
 
+#define BUFFERSIZE      4096
+
 #define VOLTAGESTEP     1
 
 /*
@@ -85,6 +87,15 @@ int tempOffsetAlt(int);
  * Returns 0 on success, -1 on error
  */
 int daemonUpdateInterval(unsigned int);
+
+/*
+ * Enable/disable daemon.
+ * int set = 0 -> disable,
+ * int set = 1 -> enable,
+ * int set = 2 -> check if enabled,
+ * returns 0 on success, -1 on error
+ */
+int systemdService(int);
 
 /*
  * Resets all Values to 0
