@@ -21,7 +21,7 @@
 
 #include "intel_undervolt.h"
 
-#define IUVUIVERSION    "iuvui 0.1.0"
+#define IUVUIVERSION    "iuvui 0.2.0"
 
 #define GUILOGSIZE      256
 #define ROWHEIGHT       25
@@ -41,7 +41,7 @@
 #include "nuklear_xlib_gl2.h"
 
 #define WINDOW_WIDTH 510
-#define WINDOW_HEIGHT 350
+#define WINDOW_HEIGHT 500
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
@@ -117,6 +117,12 @@ int main(void) {
         static char guiLog[GUILOGSIZE];
         int currentValues[COUNTELEMENTS] = {0};
         int newValues[COUNTELEMENTS] = {0};
+        time_t startT = 0.0l;
+        time_t endT = 0.0l;
+        /* power consumption measurement: */
+        static char currPowerVals[5][BUFSZSMALL] = {""};
+        int maxname = 0;
+        powercap_list_t *pcapList = get_powercap(&maxname);
 
         memset(&win, 0, sizeof(win));
         win.dpy = XOpenDisplay(NULL);
@@ -435,6 +441,28 @@ int main(void) {
                         }
                         nk_layout_row_end(ctx);
 
+                        /* Power consumption */
+                        nk_layout_row_static(ctx, ROWHEIGHT, ROWWIDTH*3, 1);
+                        nk_label(ctx, "Current power consumption and temperature:", NK_TEXT_LEFT);
+                        
+                        nk_layout_row_dynamic(ctx, ROWHEIGHT, 2);
+                        nk_label(ctx, currPowerVals[0], NK_TEXT_LEFT);
+                        nk_label(ctx, currPowerVals[1], NK_TEXT_LEFT);
+                        nk_layout_row_dynamic(ctx, ROWHEIGHT, 2);
+                        nk_label(ctx, currPowerVals[2], NK_TEXT_LEFT);
+                        nk_label(ctx, currPowerVals[3], NK_TEXT_LEFT);
+
+                        if (startT > endT) {
+                                startT = 0.0l;
+                                endT = 0.0l;
+                                measurePowerConsumption(currPowerVals, pcapList, 4, maxname);
+                        } else if (startT == 0.0l && endT == 0.0l) {
+                                time(&startT);
+                                endT = startT + 1;
+                        } else {
+                                time(&startT);
+                        }                        
+
                         /* Output Log */
                         nk_layout_row_dynamic(ctx, ROWHEIGHT, 1);
                         nk_label(ctx, "Output log:", NK_TEXT_LEFT);
@@ -458,6 +486,23 @@ int main(void) {
         }
 
 cleanup:
+
+        while (pcapList) {
+		powercap_list_t * next = pcapList->next;
+		free(pcapList->name);
+		free(pcapList->dir);
+		free(pcapList);
+		pcapList = next;
+	}
+
+        /*while (coretemp_list) {
+		hwmon_list_t * next = coretemp_list->next;
+		free(coretemp_list->name);
+		free(coretemp_list->dir);
+		free(coretemp_list);
+		coretemp_list = next;
+        }*/
+
         nk_x11_shutdown();
         glXMakeCurrent(win.dpy, 0, 0);
         glXDestroyContext(win.dpy, glContext);

@@ -3,6 +3,8 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include "measure.h"
+
 #define CONFFILE        "/etc/intel-undervolt.conf"
 
 /* count elements below */
@@ -54,8 +56,7 @@ int readVal(int *);
  */
 short applyValues(int *, int *);
 
-void measurePowerConsumption();
-int daemonMode();
+int measurePowerConsumption(char [][BUFSZSMALL], powercap_list_t *, int, int);
 
 /*
  * Set Power Limits Alteration
