@@ -201,7 +201,6 @@ int getCpuTemp(char currTempVals[][BUFSZSMALL], hwmon_list_t *hwlst, int *maxnam
                 hwmon_list_t *hwmonNext = hwlst;
                 while (hwmonNext && i < el) {
                         snprintf(currTempVals[i], BUFSZSMALL, "%s %s", hwmonNext->name, hwmonNext->val);
-                        //strncat(currTempVals[i], , BUFSZSMALL/2);
                         hwmonNext = hwmonNext->next;
                         ++i;
                 }

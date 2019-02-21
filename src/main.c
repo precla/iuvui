@@ -459,11 +459,11 @@ int main(void) {
                         nk_label(ctx, "Current power consumption:", NK_TEXT_LEFT);
                         
                         nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currPowerVals[0], NK_TEXT_LEFT);
-                        nk_label(ctx, currPowerVals[1], NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currPowerVals[2], NK_TEXT_LEFT);
                         nk_label(ctx, currPowerVals[3], NK_TEXT_LEFT);
+                        nk_label(ctx, currPowerVals[2], NK_TEXT_LEFT);
+                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
+                        nk_label(ctx, currPowerVals[1], NK_TEXT_LEFT);
+                        nk_label(ctx, currPowerVals[0], NK_TEXT_LEFT);
 
                         if (startT > endT) {
                                 startT = 0.0l;
@@ -483,19 +483,19 @@ int main(void) {
                         nk_layout_row_static(ctx, ROWHEIGHT, ROWWIDTH*3, 1);
                         nk_label(ctx, "Current temperatures:", NK_TEXT_LEFT);
                         nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currTempVals[0], NK_TEXT_LEFT);
-                        nk_label(ctx, currTempVals[1], NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currTempVals[2], NK_TEXT_LEFT);
-                        nk_label(ctx, currTempVals[3], NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currTempVals[4], NK_TEXT_LEFT);
-                        nk_label(ctx, currTempVals[5], NK_TEXT_LEFT);
+                        nk_label(ctx, currTempVals[8], NK_TEXT_LEFT);
+                        nk_label(ctx, currTempVals[7], NK_TEXT_LEFT);
                         nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
                         nk_label(ctx, currTempVals[6], NK_TEXT_LEFT);
-                        nk_label(ctx, currTempVals[7], NK_TEXT_LEFT);
+                        nk_label(ctx, currTempVals[5], NK_TEXT_LEFT);
+                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
+                        nk_label(ctx, currTempVals[4], NK_TEXT_LEFT);
+                        nk_label(ctx, currTempVals[3], NK_TEXT_LEFT);
+                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
+                        nk_label(ctx, currTempVals[2], NK_TEXT_LEFT);
+                        nk_label(ctx, currTempVals[1], NK_TEXT_LEFT);
                         nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 1);
-                        nk_label(ctx, currTempVals[8], NK_TEXT_LEFT);
+                        nk_label(ctx, currTempVals[0], NK_TEXT_LEFT);
 
                         nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 1);
                         nk_label(ctx, SEPARATOR, NK_TEXT_LEFT);
