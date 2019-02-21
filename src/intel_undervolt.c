@@ -170,19 +170,14 @@ short applyValues(int *newValues, int *currentValues) {
 
 int measurePowerConsumption(char currPVals[][BUFSZSMALL], powercap_list_t *pcapList, int elCount, int maxname) {
         int i = 0;
-        char tmp[BUFSZSMALL];
         powercap_list_t *pListNext = pcapList;
 
         savePowercapNextAsDouble(pcapList, maxname);
 
         while (pListNext) {
                 if (i < elCount) {
-                        strcpy(tmp, "");
-                        snprintf(tmp, BUFSZSMALL/2, "%s : ", pListNext->name);
-                        strncpy(currPVals[i], tmp, BUFSZSMALL/2);
-                        snprintf(tmp, BUFSZSMALL/2, "%3.03f W", pListNext->val);
-                        strncat(currPVals[i], tmp, BUFSZSMALL/2);
-                        i++;
+                        snprintf(currPVals[i], BUFSZSMALL, "%s : %3.03f W", pListNext->name, pListNext->val);
+                        ++i;
                 } else {
                         break;
                 }
