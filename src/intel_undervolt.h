@@ -58,6 +58,8 @@ short applyValues(int *, int *);
 
 int measurePowerConsumption(char [][BUFSZSMALL], powercap_list_t *, int, int);
 
+int getCpuTemp(char [][BUFSZSMALL], hwmon_list_t *, int *, int);
+
 /*
  * Set Power Limits Alteration
  * see config:

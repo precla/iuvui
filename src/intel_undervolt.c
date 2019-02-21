@@ -192,6 +192,23 @@ int measurePowerConsumption(char currPVals[][BUFSZSMALL], powercap_list_t *pcapL
         return 0;
 }
 
+int getCpuTemp(char currTempVals[][BUFSZSMALL], hwmon_list_t *hwlst, int *maxname, int el){
+        char tmp[BUFSZSMALL];
+        int i = 0;
+        hwlst = getCoretemp(&maxname);
+        if (hwlst != NULL) {
+                getHwmonNextValues(hwlst, maxname, tmp);
+                hwmon_list_t *hwmonNext = hwlst;
+                while (hwmonNext && i < el) {
+                        snprintf(currTempVals[i], BUFSZSMALL, "%s %s", hwmonNext->name, hwmonNext->val);
+                        //strncat(currTempVals[i], , BUFSZSMALL/2);
+                        hwmonNext = hwmonNext->next;
+                        ++i;
+                }
+        }
+        return 0;
+}
+
 int powerLimitAlt(float shortPowerVal, float longPowerVal) {
         /* TODO */
         return 0;

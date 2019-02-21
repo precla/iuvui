@@ -35,7 +35,7 @@ void savePowercapNextAsDouble(powercap_list_t *lst, int maxname) {
 	}
 }
 
-powercap_list_t * get_powercap(int * maxname) {
+powercap_list_t *getPowercap(int *maxname) {
 	char buf[BUFSZSMALL];
 	powercap_list_t * lst = NULL;
 
@@ -76,17 +76,12 @@ powercap_list_t * get_powercap(int * maxname) {
 	return lst;
 }
 
-/*
-void print_hwmon_next(hwmon_list_t * lst, int maxname, char * buf,
-	char * degstr, bool * nl, bool * nll) {
+void getHwmonNextValues(hwmon_list_t *lst, int maxname, char *buf) {
 	if (!lst) {
 		return;
 	}
-	bool nlla = false;
-	if (!nll) {
-		nll = &nlla;
-	}
-	print_hwmon_next(lst->next, maxname, buf, degstr, nl, nll);
+
+	getHwmonNextValues(lst->next, maxname, buf);
 
 	sprintf(buf, DIR_HWMON "/%s/temp%d_input", lst->dir, lst->index);
 	int fd = open(buf, O_RDONLY);
@@ -95,35 +90,13 @@ void print_hwmon_next(hwmon_list_t * lst, int maxname, char * buf,
 		if (count > 0) {
 			buf[buf[count - 1] == '\n' ? count - 1 : count] = '\0';
 			double dval = atol(buf) / 1000.;
-			printf("%9.03f%s\n", dval, degstr);
+			snprintf(lst->val, BUFSZSMALL, "%6.01f%s", dval, " C");
 		}
 		close(fd);
 	}
 }
 
-
-void print_cpufreq(int maxname, char *buf, bool *nl) {
-	bool nll = false;
-
-	int i;
-	for (i = 0;; i++) {
-		sprintf(buf, "/sys/bus/cpu/devices/cpu%d/cpufreq/scaling_cur_freq", i);
-		int fd = open(buf, O_RDONLY);
-		if (fd < 0) {
-			break;
-		}
-		int count = read(fd, buf, BUFSZSMALL - 1);
-		if (count > 0) {
-			buf[buf[count - 1] == '\n' ? count - 1 : count] = '\0';
-			double dval = atol(buf) / 1000.;
-			sprintf(buf, "Core %d", i);
-			printf("%9.03f MHz\n", dval);
-		}
-		close(fd);
-	}
-}
-
-bool get_hwmon(const char * name, char * out) {
+bool getHwmon(const char * name, char * out) {
 	char buf[BUFSZSMALL];
 
 	DIR * dir = opendir(DIR_HWMON);
@@ -157,12 +130,12 @@ bool get_hwmon(const char * name, char * out) {
 	return false;
 }
 
-hwmon_list_t *get_coretemp(int * maxname) {
+hwmon_list_t *getCoretemp(int *maxname) {
 	char hdir[BUFSZSMALL];
 	char buf[BUFSZSMALL];
 	hwmon_list_t * lst = NULL;
 
-	if (!get_hwmon("coretemp", hdir)) {
+	if (!getHwmon("coretemp", hdir)) {
 		fprintf(stderr, "Failed to find coretemp hwmon\n");
 		return NULL;
 	}
@@ -196,6 +169,7 @@ hwmon_list_t *get_coretemp(int * maxname) {
 		nlst->next = lst;
 		lst = nlst;
 		nlst->name = name;
+		strncat(nlst->name, " : ", 4);
 		nlst->dir = malloc(strlen(hdir) + 1);
 		strcpy(nlst->dir, hdir);
 		nlst->index = i;
@@ -206,5 +180,27 @@ hwmon_list_t *get_coretemp(int * maxname) {
 	}
 
 	return lst;
+}
+
+/*
+void printCpufreq(int maxname, char *buf, bool *nl) {
+	bool nll = false;
+
+	int i;
+	for (i = 0;; i++) {
+		sprintf(buf, "/sys/bus/cpu/devices/cpu%d/cpufreq/scaling_cur_freq", i);
+		int fd = open(buf, O_RDONLY);
+		if (fd < 0) {
+			break;
+		}
+		int count = read(fd, buf, BUFSZSMALL - 1);
+		if (count > 0) {
+			buf[buf[count - 1] == '\n' ? count - 1 : count] = '\0';
+			double dval = atol(buf) / 1000.;
+			sprintf(buf, "Core %d", i);
+			printf("%9.03f MHz\n", dval);
+		}
+		close(fd);
+	}
 }
 */
