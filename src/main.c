@@ -30,6 +30,11 @@
 #define ROWWIDTH        110
 #define MVLABEL         15
 
+/* number of power value elements - make dynamic? */
+#define POWERVALEL      4
+/* number of temperature elements - make dynamic? */
+#define TEMPERATUREEL   9
+
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_STANDARD_VARARGS
@@ -122,8 +127,8 @@ int main(void) {
         time_t startT = 0.0l;
         time_t endT = 0.0l;
         /* power consumption measurement: */
-        static char currPowerVals[4][BUFSZSMALL] = {""};
-        static char currTempVals[9][BUFSZSMALL] = {""};
+        static char currPowerVals[POWERVALEL][BUFSZSMALL] = {""};
+        static char currTempVals[TEMPERATUREEL][BUFSZSMALL] = {""};
         int maxname = 0;
         powercap_list_t *pcapList = getPowercap(&maxname);
         hwmon_list_t *hwmonList = getCoretemp(&maxname);
@@ -469,7 +474,7 @@ int main(void) {
                                 startT = 0.0l;
                                 endT = 0.0l;
                                 measurePowerConsumption(currPowerVals, pcapList, 4, maxname);
-                                getCpuTemp(currTempVals, hwmonList, &maxname, 9);
+                                getCpuTemp(currTempVals, hwmonList, &maxname, TEMPERATUREEL);
                         } else if (startT == 0.0l && endT == 0.0l) {
                                 time(&startT);
                                 endT = startT + 1;
@@ -482,20 +487,20 @@ int main(void) {
 
                         nk_layout_row_static(ctx, ROWHEIGHT, ROWWIDTH*3, 1);
                         nk_label(ctx, "Current temperatures:", NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currTempVals[8], NK_TEXT_LEFT);
-                        nk_label(ctx, currTempVals[7], NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currTempVals[6], NK_TEXT_LEFT);
-                        nk_label(ctx, currTempVals[5], NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currTempVals[4], NK_TEXT_LEFT);
-                        nk_label(ctx, currTempVals[3], NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currTempVals[2], NK_TEXT_LEFT);
-                        nk_label(ctx, currTempVals[1], NK_TEXT_LEFT);
-                        nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 1);
-                        nk_label(ctx, currTempVals[0], NK_TEXT_LEFT);
+                        
+                        int i = TEMPERATUREEL-1;
+                        while (i > -1) {
+                                if (strlen(currTempVals[i]) < 2) {
+                                        --i;
+                                        continue;
+                                }
+                                nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
+                                nk_label(ctx, currTempVals[i], NK_TEXT_LEFT);
+                                if (i > 0) {
+                                        nk_label(ctx, currTempVals[i-1], NK_TEXT_LEFT);
+                                }
+                                i -= 2;
+                        }
 
                         nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 1);
                         nk_label(ctx, SEPARATOR, NK_TEXT_LEFT);
