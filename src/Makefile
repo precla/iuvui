@@ -1,7 +1,7 @@
 TARGET = iuvui
 TARGET_DEBUG = iuvui_dev
 CC = gcc
-CFLAGS = -Wall -std=gnu11 -pedantic -O2
+CFLAGS = -Wall -std=gnu11 -pedantic -march=native -O2
 LDLIBS = -lX11 -lm -lGL -lGLU
 SRC = $(wildcard *.c)
 SRCTOOBJ = $(patsubst %.c,%.o, $(SRC))
