@@ -47,7 +47,7 @@ powercap_list_t *getPowercap(int *maxname) {
 	struct dirent * dirent;
 	while ((dirent = readdir(dir))) {
 		if (strstr(dirent->d_name, ":") && strlen(dirent->d_name) <= 30) {
-			sprintf(buf, DIR_POWERCAP "/%s/name", dirent->d_name);
+			snprintf(buf, BUFSZSMALL, DIR_POWERCAP "/%s/name", dirent->d_name);
 			int fd = open(buf, O_RDONLY);
 			if (fd >= 0) {
 				int count = read(fd, buf, BUFSZSMALL - 1);
@@ -107,7 +107,7 @@ bool getHwmon(const char * name, char * out) {
 	struct dirent * dirent;
 	while ((dirent = readdir(dir))) {
 		if (strlen(dirent->d_name) <= 30) {
-			sprintf(buf, DIR_HWMON "/%s/name", dirent->d_name);
+			snprintf(buf, BUFSZSMALL, DIR_HWMON "/%s/name", dirent->d_name);
 			int fd = open(buf, O_RDONLY);
 			if (fd >= 0) {
 				int count = read(fd, buf, BUFSZSMALL - 1);
@@ -142,12 +142,12 @@ hwmon_list_t *getCoretemp(int *maxname) {
 
 	int i;
 	for (i = 1;; i++) {
-		sprintf(buf, DIR_HWMON "/%s/temp%d_input", hdir, i);
+		snprintf(buf, BUFSZSMALL, DIR_HWMON "/%.256s/temp%d_input", hdir, i);
 		int fd = open(buf, O_RDONLY);
 		if (fd < 0) {
 			break;
 		}
-		sprintf(buf, DIR_HWMON "/%s/temp%d_label", hdir, i);
+		snprintf(buf, BUFSZSMALL, DIR_HWMON "/%.256s/temp%d_label", hdir, i);
 		fd = open(buf, O_RDONLY);
 		char * name = NULL;
 		if (fd >= 0) {

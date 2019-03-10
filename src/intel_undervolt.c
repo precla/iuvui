@@ -190,12 +190,12 @@ int measurePowerConsumption(char currPVals[][BUFSZSMALL], powercap_list_t *pcapL
 int getCpuTemp(char currTempVals[][BUFSZSMALL], hwmon_list_t *hwlst, int *maxname, int el){
         char tmp[BUFSZSMALL];
         int i = 0;
-        hwlst = getCoretemp(&maxname);
+        hwlst = getCoretemp(maxname);
         if (hwlst != NULL) {
-                getHwmonNextValues(hwlst, maxname, tmp);
+                getHwmonNextValues(hwlst, *maxname, tmp);
                 hwmon_list_t *hwmonNext = hwlst;
                 while (hwmonNext && i < el) {
-                        snprintf(currTempVals[i], BUFSZSMALL, "%s %s", hwmonNext->name, hwmonNext->val);
+                        snprintf(currTempVals[i], BUFSZSMALL, "%.80s %.80s", hwmonNext->name, hwmonNext->val);
                         hwmonNext = hwmonNext->next;
                         ++i;
                 }

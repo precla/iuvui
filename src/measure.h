@@ -18,7 +18,7 @@
 
 #define DIR_POWERCAP "/sys/class/powercap"
 #define DIR_HWMON "/sys/class/hwmon"
-#define BUFSZSMALL 80
+#define BUFSZSMALL 512
 
 typedef struct {
 	void * next;
