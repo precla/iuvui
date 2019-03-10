@@ -20,7 +20,7 @@ $(TARGET): $(SRCTOOBJ)
 	-rm *.o
 
 $(SRCTOOBJ): %.o: %.c
-	$(CC) $(CFLAGS) $(BUILD) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # build for debug, with debug flag:
 #$(TARGET_DEBUG): $(SRCTOOBJDEV)
