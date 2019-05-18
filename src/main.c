@@ -107,7 +107,7 @@ int main(void) {
         }
 
         /* check if intel-undervolt is available and accessible */
-        if (access("/bin/intel-undervolt", X_OK) < 0) {
+        if (access("/bin/intel-undervolt", X_OK) < 0 && access("/usr/bin/intel-undervolt", X_OK) < 0) {
                 fprintf(stdout, "%s", "\nerror accessing intel-undervolt. Does it exist in /bin/ ?\n");
                 exit(1);
         }
