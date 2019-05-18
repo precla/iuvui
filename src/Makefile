@@ -33,3 +33,6 @@ $(SRCTOOBJ): %.o: %.c
 # clean up the mess
 clean:
 	-rm *.o $(DEST)$(TARGET)
+
+install: 
+	cp $(DEST)$(TARGET) /$(DEST)$(TARGET)
