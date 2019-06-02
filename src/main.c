@@ -15,13 +15,14 @@
 #include <time.h>
 #include <limits.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include <GL/glx.h>
 #include <GL/glxext.h>
 
 #include "intel_undervolt.h"
 
-#define IUVUIVERSION    "iuvui 0.3.0"
+#define IUVUIVERSION    "iuvui 0.4.0"
 
 #define SEPARATOR       "---------------------------------------------------------------------"
 
@@ -29,11 +30,6 @@
 #define ROWHEIGHT       25
 #define ROWWIDTH        110
 #define MVLABEL         15
-
-/* number of power value elements - make dynamic? */
-#define POWERVALEL      4
-/* number of temperature elements - make dynamic? */
-#define TEMPERATUREEL   9
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -124,14 +120,6 @@ int main(void) {
         static char guiLog[GUILOGSIZE];
         int currentValues[COUNTELEMENTS] = {0};
         int newValues[COUNTELEMENTS] = {0};
-        time_t startT = 0.0l;
-        time_t endT = 0.0l;
-        /* power consumption measurement: */
-        static char currPowerVals[POWERVALEL][BUFSZSMALL] = {""};
-        static char currTempVals[TEMPERATUREEL][BUFSZSMALL] = {""};
-        int maxname = 0;
-        powercap_list_t *pcapList = getPowercap(&maxname);
-        hwmon_list_t *hwmonList = getCoretemp(&maxname);
 
         memset(&win, 0, sizeof(win));
         win.dpy = XOpenDisplay(NULL);
@@ -267,6 +255,23 @@ int main(void) {
         newValues[ANALOGIOOFFSET]       = currentValues[ANALOGIOOFFSET];
         newValues[DAEMONINTERVAL]       = currentValues[DAEMONINTERVAL];
         
+
+        /* 
+         * get the current power consumption readings in another thread
+         * ctid - child thread
+         */
+        pthread_t ctid;
+        powerMeasureThread pmt;
+
+        if (pthread_create(&ctid, NULL, measurePowAndTemp, (void *)&pmt) != 0) {
+                for (int i = 0; i < POWERVALEL; i++){
+                        pmt.currPowerVals[i][0] = '0';
+                }
+                for (int i = 0; i < TEMPERATUREEL; i++){
+                        pmt.currTempVals[i][0] = '0';
+                }
+        }
+
         /* check if it's enabled on boot via systemd: */
         if (systemdService(2) == 0) {
                 strncpy(onBoot, "YES", 4);
@@ -464,23 +469,11 @@ int main(void) {
                         nk_label(ctx, "Current power consumption:", NK_TEXT_LEFT);
                         
                         nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currPowerVals[3], NK_TEXT_LEFT);
-                        nk_label(ctx, currPowerVals[2], NK_TEXT_LEFT);
+                        nk_label(ctx, pmt.currPowerVals[3], NK_TEXT_LEFT);
+                        nk_label(ctx, pmt.currPowerVals[2], NK_TEXT_LEFT);
                         nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                        nk_label(ctx, currPowerVals[1], NK_TEXT_LEFT);
-                        nk_label(ctx, currPowerVals[0], NK_TEXT_LEFT);
-
-                        if (startT > endT) {
-                                startT = 0.0l;
-                                endT = 0.0l;
-                                measurePowerConsumption(currPowerVals, pcapList, 4, maxname);
-                                getCpuTemp(currTempVals, hwmonList, &maxname, TEMPERATUREEL);
-                        } else if (startT == 0.0l && endT == 0.0l) {
-                                time(&startT);
-                                endT = startT + 1;
-                        } else {
-                                time(&startT);
-                        }
+                        nk_label(ctx, pmt.currPowerVals[1], NK_TEXT_LEFT);
+                        nk_label(ctx, pmt.currPowerVals[0], NK_TEXT_LEFT);
 
                         nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 1);
                         nk_label(ctx, SEPARATOR, NK_TEXT_LEFT);
@@ -490,14 +483,14 @@ int main(void) {
                         
                         int i = TEMPERATUREEL-1;
                         while (i > -1) {
-                                if (strlen(currTempVals[i]) < 2) {
+                                if (strlen(pmt.currTempVals[i]) < 2) {
                                         --i;
                                         continue;
                                 }
                                 nk_layout_row_dynamic(ctx, ROWHEIGHT/2, 2);
-                                nk_label(ctx, currTempVals[i], NK_TEXT_LEFT);
+                                nk_label(ctx, pmt.currTempVals[i], NK_TEXT_LEFT);
                                 if (i > 0) {
-                                        nk_label(ctx, currTempVals[i-1], NK_TEXT_LEFT);
+                                        nk_label(ctx, pmt.currTempVals[i-1], NK_TEXT_LEFT);
                                 }
                                 i -= 2;
                         }
@@ -528,22 +521,6 @@ int main(void) {
         }
 
 cleanup:
-
-        while (pcapList) {
-		powercap_list_t * next = pcapList->next;
-		free(pcapList->name);
-		free(pcapList->dir);
-		free(pcapList);
-		pcapList = next;
-	}
-
-        /*while (coretemp_list) {
-		hwmon_list_t * next = coretemp_list->next;
-		free(coretemp_list->name);
-		free(coretemp_list->dir);
-		free(coretemp_list);
-		coretemp_list = next;
-        }*/
 
         nk_x11_shutdown();
         glXMakeCurrent(win.dpy, 0, 0);

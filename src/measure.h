@@ -1,4 +1,5 @@
-/* taken from https://github.com/kitsunyan/intel-undervolt
+/* 
+ * taken from https://github.com/kitsunyan/intel-undervolt
  * and made a few modifications
  */
 
@@ -20,12 +21,17 @@
 #define DIR_HWMON "/sys/class/hwmon"
 #define BUFSZSMALL 512
 
+/* number of power value elements - make dynamic? */
+#define POWERVALEL      4
+/* number of temperature elements - make dynamic? */
+#define TEMPERATUREEL   9
+
 typedef struct {
 	void * next;
 	char * name;
 	char * dir;
 	int64_t last;
-    double val;
+	double val;
 	struct timespec time;
 } powercap_list_t;
 
@@ -36,6 +42,11 @@ typedef struct {
 	char val[BUFSZSMALL];
 	int index;
 } hwmon_list_t;
+
+typedef struct {
+	char currPowerVals[POWERVALEL][BUFSZSMALL];
+	char currTempVals[TEMPERATUREEL][BUFSZSMALL];
+} powerMeasureThread;
 
 void savePowercapNextAsDouble(powercap_list_t *, int);
 void printCpufreq(int, char *, bool *);

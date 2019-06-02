@@ -168,6 +168,37 @@ short applyValues(int *newValues, int *currentValues) {
         return count;
 }
 
+void *measurePowAndTemp (void *args) {
+        int maxname = 0;
+        powerMeasureThread *sarg = args;
+
+        powercap_list_t *pcapList = getPowercap(&maxname);
+        hwmon_list_t *hwmonList = getCoretemp(&maxname);
+
+        while ( !measurePowerConsumption(sarg->currPowerVals, pcapList, POWERVALEL, maxname)
+                && !getCpuTemp(sarg->currTempVals, hwmonList, TEMPERATUREEL, &maxname) ) {
+                        sleep(1);
+        }
+
+        while (pcapList) {
+		powercap_list_t *next = pcapList->next;
+		free(pcapList->name);
+		free(pcapList->dir);
+		free(pcapList);
+		pcapList = next;
+	}
+
+        while (hwmonList) {
+		hwmon_list_t *next = hwmonList->next;
+		free(hwmonList->name);
+		free(hwmonList->dir);
+		free(hwmonList);
+		hwmonList = next;
+        }
+
+        return ((void *)NULL);
+}
+
 int measurePowerConsumption(char currPVals[][BUFSZSMALL], powercap_list_t *pcapList, int elCount, int maxname) {
         int i = 0;
         powercap_list_t *pListNext = pcapList;
@@ -187,14 +218,14 @@ int measurePowerConsumption(char currPVals[][BUFSZSMALL], powercap_list_t *pcapL
         return 0;
 }
 
-int getCpuTemp(char currTempVals[][BUFSZSMALL], hwmon_list_t *hwlst, int *maxname, int el){
+int getCpuTemp(char currTempVals[][BUFSZSMALL], hwmon_list_t *hwlst, int elCount, int *maxname){
         char tmp[BUFSZSMALL];
         int i = 0;
         hwlst = getCoretemp(maxname);
         if (hwlst != NULL) {
                 getHwmonNextValues(hwlst, *maxname, tmp);
                 hwmon_list_t *hwmonNext = hwlst;
-                while (hwmonNext && i < el) {
+                while (hwmonNext && i < elCount) {
                         snprintf(currTempVals[i], BUFSZSMALL, "%.80s %.80s", hwmonNext->name, hwmonNext->val);
                         hwmonNext = hwmonNext->next;
                         ++i;

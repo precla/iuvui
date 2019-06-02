@@ -56,9 +56,11 @@ int readVal(int *);
  */
 short applyValues(int *, int *);
 
+void *measurePowAndTemp(void *);
+
 int measurePowerConsumption(char [][BUFSZSMALL], powercap_list_t *, int, int);
 
-int getCpuTemp(char [][BUFSZSMALL], hwmon_list_t *, int *, int);
+int getCpuTemp(char [][BUFSZSMALL], hwmon_list_t *, int, int *);
 
 /*
  * Set Power Limits Alteration
