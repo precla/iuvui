@@ -218,7 +218,7 @@ int measurePowerConsumption(char currPVals[][BUFSZSMALL], powercap_list_t *pcapL
         return 0;
 }
 
-int getCpuTemp(char currTempVals[][BUFSZSMALL], hwmon_list_t *hwlst, int elCount, int *maxname){
+int getCpuTemp(char currTempVals[][BUFSZSMALL], hwmon_list_t *hwlst, int elCount, int *maxname) {
         char tmp[BUFSZSMALL];
         int i = 0;
         hwlst = getCoretemp(maxname);

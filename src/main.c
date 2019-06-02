@@ -264,10 +264,10 @@ int main(void) {
         powerMeasureThread pmt;
 
         if (pthread_create(&ctid, NULL, measurePowAndTemp, (void *)&pmt) != 0) {
-                for (int i = 0; i < POWERVALEL; i++){
+                for (int i = 0; i < POWERVALEL; i++) {
                         pmt.currPowerVals[i][0] = '0';
                 }
-                for (int i = 0; i < TEMPERATUREEL; i++){
+                for (int i = 0; i < TEMPERATUREEL; i++) {
                         pmt.currTempVals[i][0] = '0';
                 }
         }
