@@ -1,3 +1,4 @@
 tmp/
 src/bin/
 *.o
+.vscode/ipch/
