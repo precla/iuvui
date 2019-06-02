@@ -38,7 +38,7 @@
             "type": "shell",
             "command": "gcc",
             "args": [
-                "-g", "-o", "${fileDirname}/bin/iuvui",
+                "-g", "-pthread", "-o", "${fileDirname}/bin/iuvui",
                 "${fileDirname}/bin/main.o", "${fileDirname}/bin/intel_undervolt.o", "${fileDirname}/bin/measure.o",
                 "-lX11", "-lm", "-lGL", "-lGLU"
             ],
