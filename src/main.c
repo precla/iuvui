@@ -246,15 +246,14 @@ int main(void) {
 
         if (readVal(currentValues)) {
                 strncpy(guiLog, "ERROR reading values from /etc/intel-undervolt.conf", GUILOGSIZE);
+        } else {
+                newValues[CPUOFFSET]            = currentValues[CPUOFFSET];
+                newValues[GPUOFFSET]            = currentValues[GPUOFFSET];
+                newValues[CPUCACHEOFFSET]       = currentValues[CPUCACHEOFFSET];
+                newValues[SYSAOFFSET]           = currentValues[SYSAOFFSET];
+                newValues[ANALOGIOOFFSET]       = currentValues[ANALOGIOOFFSET];
+                newValues[DAEMONINTERVAL]       = currentValues[DAEMONINTERVAL];
         }
-
-        newValues[CPUOFFSET]            = currentValues[CPUOFFSET];
-        newValues[GPUOFFSET]            = currentValues[GPUOFFSET];
-        newValues[CPUCACHEOFFSET]       = currentValues[CPUCACHEOFFSET];
-        newValues[SYSAOFFSET]           = currentValues[SYSAOFFSET];
-        newValues[ANALOGIOOFFSET]       = currentValues[ANALOGIOOFFSET];
-        newValues[DAEMONINTERVAL]       = currentValues[DAEMONINTERVAL];
-        
 
         /* 
          * get the current power consumption readings in another thread
