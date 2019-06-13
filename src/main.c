@@ -264,10 +264,10 @@ int main(void) {
 
         if (pthread_create(&ctid, NULL, measurePowAndTemp, (void *)&pmt) != 0) {
                 for (int i = 0; i < POWERVALEL; i++) {
-                        pmt.currPowerVals[i][0] = '0';
+                        pmt.currPowerVals[i][0] = '\0';
                 }
                 for (int i = 0; i < TEMPERATUREEL; i++) {
-                        pmt.currTempVals[i][0] = '0';
+                        pmt.currTempVals[i][0] = '\0';
                 }
         }
 
@@ -482,7 +482,7 @@ int main(void) {
                         
                         int i = TEMPERATUREEL-1;
                         while (i > -1) {
-                                if (strlen(pmt.currTempVals[i]) < 2) {
+                                if (strlen(pmt.currTempVals[i]) < 7) {
                                         --i;
                                         continue;
                                 }
